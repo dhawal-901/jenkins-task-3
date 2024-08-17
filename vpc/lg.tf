@@ -1,5 +1,5 @@
 resource "aws_lb_listener" "jenkins_redirect_to_https" {
-  load_balancer_arn = aws_lb.my_lb.arn
+  load_balancer_arn = aws_lb.my_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -15,11 +15,11 @@ resource "aws_lb_listener" "jenkins_redirect_to_https" {
 }
 
 resource "aws_lb_listener" "jenkins_forward_to_target_group" {
-  load_balancer_arn = aws_lb.my_lb.arn
+  load_balancer_arn = aws_lb.my_alb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = local.Environment.certificate_arn
+  certificate_arn   = local.Environment.certificate_1_arn
 
   default_action {
     type             = "forward"

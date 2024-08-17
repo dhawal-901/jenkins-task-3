@@ -10,10 +10,11 @@ resource "aws_key_pair" "my_private_instance_key" {
 
 
 resource "aws_instance" "my_public_instance" {
-  ami                         = local.Environment.ubuntu_ami
-  instance_type               = local.Environment.ubuntu_instance_type
-  subnet_id                   = module.vpc.public_subnets[0]
-  vpc_security_group_ids      = [aws_security_group.my_public_sg.id]
+  count                  = 1
+  ami                         = local.Environment.public_instance_ami
+  instance_type               = local.Environment.public_instance_type
+  subnet_id                   = module.vpc.private_subnets[(count.index) % 2]
+  vpc_security_group_ids      = [ aws_security_group.my_public_sg.id]
   key_name                    = aws_key_pair.my_public_instance_key.key_name
   associate_public_ip_address = true
 
@@ -24,11 +25,11 @@ resource "aws_instance" "my_public_instance" {
 }
 
 resource "aws_instance" "my_private_instance" {
-  count                  = 3
-  ami                    = local.Environment.ubuntu_ami
-  instance_type          = local.Environment.ubuntu_instance_type
+  count                  = 1
+  ami                    = local.Environment.private_instance_ami
+  instance_type          = local.Environment.private_instance_type
   subnet_id              = module.vpc.private_subnets[(count.index) % 2]
-  vpc_security_group_ids = [aws_security_group.my_lb_sg.id, aws_security_group.my_private_sg.id]
+  vpc_security_group_ids = [aws_security_group.my_private_sg.id, aws_security_group.my_public_sg.id]
   key_name               = aws_key_pair.my_private_instance_key.key_name
   tags = {
     Name = "PRIVATE_INSTANCE_TF_${count.index + 1}_${terraform.workspace}"
