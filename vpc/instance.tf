@@ -13,7 +13,7 @@ resource "aws_instance" "my_public_instance" {
   count                  = 1
   ami                         = local.Environment.public_instance_ami
   instance_type               = local.Environment.public_instance_type
-  subnet_id                   = module.vpc.private_subnets[(count.index) % 2]
+  subnet_id                   = module.vpc.public_subnets[(count.index) % 2]
   vpc_security_group_ids      = [ aws_security_group.my_public_sg.id]
   key_name                    = aws_key_pair.my_public_instance_key.key_name
   associate_public_ip_address = true
