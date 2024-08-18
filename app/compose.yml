@@ -1,0 +1,5 @@
+services:
+  my-app:
+    image: "dhawal901/jenkins-task-3:19"
+    ports:
+      - 80:80
