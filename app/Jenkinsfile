@@ -19,6 +19,9 @@
 
 pipeline {
     agent any
+    environment {
+        NEW_VERSION = "${env.BUILD_NUMBER}"
+    }
     tools {
         nodejs 'Node Js'
     }
@@ -57,7 +60,7 @@ pipeline {
         stage('Update Compose file'){
             steps{
                 script{
-                    sh 'bash app/update_compose.sh'
+                    sh "bash app/update_compose.sh ${NEW_VERSION}"
                 }
             }
         }
