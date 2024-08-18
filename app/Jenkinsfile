@@ -54,5 +54,19 @@ pipeline {
                 }
             }    
         }
+        stage('Update Compose file'){
+            steps{
+                script{
+                    sh 'bash update_compose.sh'
+                }
+            }
+        }
+        stage('Start the service'){
+            steps{
+                script{
+                    docker compose up
+                }
+            }
+        }
     }
 }
