@@ -55,18 +55,12 @@ resource "aws_security_group" "my_private_sg" {
     to_port         = 8080
     security_groups = [aws_security_group.my_alb_sg.id]
   }
-  # ingress {
-  #   protocol        = "-1"
-  #   from_port       = 0
-  #   to_port         = 0
-  #   security_groups = [aws_security_group.my_lb_sg.id]
-  # }
-  # ingress {
-  #   protocol    = "-1"
-  #   from_port   = 0
-  #   to_port     = 0
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    security_groups = [aws_security_group.my_alb_sg.id]
+  }
   egress {
     protocol    = "-1"
     from_port   = 0
