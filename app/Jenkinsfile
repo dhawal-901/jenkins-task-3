@@ -67,7 +67,7 @@ pipeline {
         stage('Start the service'){
             steps{
                 script{
-                   sh 'docker compose -f app/compose.yml up'
+                   sh 'docker compose -f app/compose.yml up -d'
                 }
             }
         }
