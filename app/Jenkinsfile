@@ -57,7 +57,7 @@ pipeline {
         stage('Update Compose file'){
             steps{
                 script{
-                    sh 'bash update_compose.sh'
+                    sh 'bash app/update_compose.sh'
                 }
             }
         }
