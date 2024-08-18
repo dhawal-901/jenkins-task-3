@@ -1,0 +1,58 @@
+// node {    
+//     def app     
+//     stage('Checkout') {
+//         steps {
+//             git branch: 'app', url: 'https://github.com/dhawal-901/jenkins-task-3.git'
+//         }
+//     }     
+//     stage('Build image') {         
+//         app = docker.build("jenkins-task-3","app/")    
+//     }     
+//     stage('Push image') {
+//         docker.withRegistry('https://registry.hub.docker.com', '18079f7d-8f38-47c8-9da5-8ea67b10bf1c') {            
+//             app.push("${env.BUILD_NUMBER}")            
+//             app.push("latest")        
+//         }    
+//     }
+// }
+
+
+pipeline {
+    agent any
+    tools {
+        nodejs 'Node Js'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'app', url: 'https://github.com/dhawal-901/jenkins-task-3.git'
+            }
+        }     
+        stage('Build image') { 
+            steps {
+                script {
+                    app = docker.build("dhawal901/jenkins-task-3","app/")    
+                }
+            }
+        } 
+        // stage('Tag image') { 
+        //     steps {
+        //         script {
+        //             sh "docker tag jenkins-task-3 dhawal901/jenkins-task-3:${env.BUILD_NUMBER}"
+        //         }
+        //     }
+        // } 
+        stage('Push image') {
+            steps {
+                script {
+                    docker.withRegistry("https://registry.hub.docker.com", "docker-hub") {            
+                    //     sh "docker push dhawal901/jenkins-task-3:${env.BUILD_NUMBER}"
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")      
+                    }
+                }
+            }    
+        }
+    }
+}
