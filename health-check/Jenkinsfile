@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    // triggers {
+    //     cron('H/5 * * * *')
+    // }
+    stages {
+        stage('Health Check') {
+            steps {
+                script {
+                    def url = 'https://jenkins.test.dhawal.in.net/app'
+                    def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' ${url}", returnStdout: true).trim()
+
+                    if (response == '200') {
+                        echo "Applicaton is up and running!"
+                    } else {
+                        error "Application is unreachable. Status code: ${response}"
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Health Check Finished!'
+        }
+        failure {
+            echo 'Your Service is down!'
+            mail to: 'dhawal@gkmit.co',
+                 subject: "Nginx Health Check Failed",
+                 body: "Your React application running on Nginx is down. Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Please check immediately."
+
+            // slackSend(channel: '#your-channel', color: 'danger', 
+            //           message: "Your React application running on Nginx is down. Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Please check immediately")
+        }
+    }
+}
