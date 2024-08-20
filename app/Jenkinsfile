@@ -1,29 +1,7 @@
-// node {    
-//     def app     
-//     stage('Checkout') {
-//         steps {
-//             git branch: 'app', url: 'https://github.com/dhawal-901/jenkins-task-3.git'
-//         }
-//     }     
-//     stage('Build image') {         
-//         app = docker.build("jenkins-task-3","app/")    
-//     }     
-//     stage('Push image') {
-//         docker.withRegistry('https://registry.hub.docker.com', '18079f7d-8f38-47c8-9da5-8ea67b10bf1c') {            
-//             app.push("${env.BUILD_NUMBER}")            
-//             app.push("latest")        
-//         }    
-//     }
-// }
-
-
 pipeline {
     agent any
     environment {
         NEW_VERSION = "${env.BUILD_NUMBER}"
-    }
-    tools {
-        nodejs 'Node Js'
     }
     
     stages {
