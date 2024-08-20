@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'app', url: 'https://github.com/dhawal-901/jenkins-task-3.git'
+                git branch: 'app', url: 'https://github.com/dhawal-901/jenkins-task-3.git', credentialsId: 'github-token'
             }
         }     
         stage('Build image') { 
