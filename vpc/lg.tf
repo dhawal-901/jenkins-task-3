@@ -1,4 +1,4 @@
-resource "aws_lb_listener" "jenkins_redirect_to_https" {
+resource "aws_lb_listener" "redirect_to_https" {
   load_balancer_arn = aws_lb.my_alb.arn
   port              = "80"
   protocol          = "HTTP"
@@ -12,9 +12,10 @@ resource "aws_lb_listener" "jenkins_redirect_to_https" {
       status_code = "HTTP_301"
     }
   }
+  depends_on = [ aws_lb_listener.forward_to_target_group ]
 }
 
-resource "aws_lb_listener" "jenkins_forward_to_target_group" {
+resource "aws_lb_listener" "forward_to_target_group" {
   load_balancer_arn = aws_lb.my_alb.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -22,51 +23,55 @@ resource "aws_lb_listener" "jenkins_forward_to_target_group" {
   certificate_arn   = local.Environment.certificate_1_arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.my_target_group_1.arn
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/html"
+      message_body = "<h1>This is Test Domain, You are not supposed to visit here.</h1>"
+      status_code  = "200"
+    }
   }
 }
 
 resource "aws_lb_listener_rule" "app-rule" {
-  listener_arn = aws_lb_listener.jenkins_forward_to_target_group.arn
+  listener_arn = aws_lb_listener.forward_to_target_group.arn
   priority     = 1
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.my_target_group_2.arn
   }
   condition {
-    path_pattern {
-      values = ["/app*"]
+    host_header {
+      values = ["app.test.dhawal.in.net"]
     }
   }
+  depends_on = [ aws_lb_listener.forward_to_target_group, aws_lb_target_group.my_target_group_2 ]
+}
+resource "aws_lb_listener_rule" "jenkins-rule" {
+  listener_arn = aws_lb_listener.forward_to_target_group.arn
+  priority     = 2
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.my_target_group_1.arn
+  }
+  condition {
+    host_header {
+      values = ["jenkins.test.dhawal.in.net"]
+    }
+  }
+  depends_on = [ aws_lb_listener.forward_to_target_group, aws_lb_target_group.my_target_group_1 ]
 }
 
-
-# resource "aws_lb_listener" "app_redirect_to_https" {
-#   load_balancer_arn = aws_lb.my_alb.arn
-#   port              = "81"
-#   protocol          = "HTTP"
-
-#   default_action {
-#     type = "redirect"
-
-#     redirect {
-#       port        = "444"
-#       protocol    = "HTTPS"
-#       status_code = "HTTP_301"
-#     }
-#   }
-# }
-
-# resource "aws_lb_listener" "app_forward_to_target_group" {
-#   load_balancer_arn = aws_lb.my_alb.arn
-#   port              = "444"
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#   certificate_arn   = local.Environment.certificate_2_arn
-
-#   default_action {
+# resource "aws_lb_listener_rule" "app-rule" {
+#   listener_arn = aws_lb_listener.forward_to_target_group.arn
+#   priority     = 1
+#   action {
 #     type             = "forward"
 #     target_group_arn = aws_lb_target_group.my_target_group_2.arn
+#   }
+#   condition {
+#     path_pattern {
+#       values = ["/app*"]
+#     }
 #   }
 # }
