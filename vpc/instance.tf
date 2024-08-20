@@ -8,11 +8,11 @@
 #   public_key = file("../keys/private-1.pub")
 # }
 data "aws_key_pair" "my_public_instance_key" {
-  key_name   = "my_public_instance_key"
+  key_name = "my_public_instance_key"
 }
 
 data "aws_key_pair" "my_private_instance_key" {
-  key_name   = "my_private_instance_key"
+  key_name = "my_private_instance_key"
 }
 
 
@@ -38,10 +38,9 @@ resource "aws_instance" "my_private_instance" {
   subnet_id              = module.vpc.private_subnets[(count.index) % 2]
   vpc_security_group_ids = [aws_security_group.my_private_sg.id, aws_security_group.my_public_sg.id]
   key_name               = data.aws_key_pair.my_private_instance_key.key_name
-  #  ebs_block_device {
-  #   device_name = "/dev/sdf"
-  #   volume_size = 20
-  # }
+  root_block_device {
+    volume_size = 20
+  }
   tags = {
     Name = "PRIVATE_INSTANCE_TF_${count.index + 1}_${terraform.workspace}"
   }
