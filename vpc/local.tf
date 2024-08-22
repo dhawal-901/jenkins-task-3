@@ -14,7 +14,7 @@ locals {
 
       target_group_1_name = "lg-target-1-dev"
       target_group_2_name = "lg-target-2-dev"
-      my_certificate_arn  = "arn:aws:acm:ap-south-1:905418378622:certificate/eac00c02-751c-415f-95ba-ba4a3d71337d"
+      my_certificate_arn  = "arn:aws:acm:ap-south-1:905418378622:certificate/997bac17-1ddd-4bd9-aed7-013dab41e284"
 
       my_domains = ["jenkins.test.dhawal.in.net", "app.test.dhawal.in.net"]
 
