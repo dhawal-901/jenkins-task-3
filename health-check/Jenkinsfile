@@ -1,13 +1,18 @@
+
+
 pipeline {
     agent any
     // triggers {
     //     cron('H/5 * * * *')
     // }
+    environment{
+        CHANNEL_ID= credentials('slack-channel-id') 
+    }
     stages {
         stage('Health Check') {
             steps {
                 script {
-                    def url = 'https://jenkins.test.dhawal.in.net/app'
+                    def url = 'https://app.test.dhawal.in.net'
                     def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' ${url}", returnStdout: true).trim()
 
                     if (response == '200') {
@@ -26,12 +31,11 @@ pipeline {
         }
         failure {
             echo 'Your Service is down!'
-            mail to: 'dhawal@gkmit.co',
-                 subject: "Nginx Health Check Failed",
-                 body: "Your React application running on Nginx is down. Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Please check immediately."
-
-            // slackSend(channel: '#your-channel', color: 'danger', 
-            //           message: "Your React application running on Nginx is down. Job: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Please check immediately")
+            slackSend(
+                channel: "${CHANNEL_ID}", 
+                color: 'danger', 
+                message: "Your React application running on Nginx with PORT no 80 is down.\n Job: ${env.JOB_NAME}\nBuild Number: #${env.BUILD_NUMBER}.\nBuild_URL:${env.BUILD_URL} Please check immediately",
+            )
         }
     }
 }
